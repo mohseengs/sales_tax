@@ -1,68 +1,48 @@
-class Products
-    private
-        @@exempt = ["book", "chocolate bar", "headache pills", "box of chocolates", "packet of headache pills"]
-
-    public
-    def self.is_exempt(product_name)
-        true if @@exempt.include? product_name
+class Product
+    attr_accessor :name , :price , :quantity , :is_imported , :is_exampt
+    def initialize(name,price,quantity,is_imported,is_exampt)
+        @name = name
+        @price = price
+        @quantity = quantity
+        @is_imported = is_imported
+        @is_exampt = is_exampt
     end
 end
 
-class Tax < Products
-    @@total_price = 0
-    @@total_tax = 0
-
-    def calculate(product)
-        hash = product
-        @tax = 0.1
-        @tax += 0.05 if hash[:is_imported] == true
-        if Products.is_exempt(hash[:name].strip) == true
-            @tax = 0
-        end
-        @tax *= hash[:price] 
-        product_total = @tax + hash[:price] 
-        @@total_tax += @tax
-        @@total_price += product_total
-        return product_total
-    end
-
+$products = []
+n = gets.chomp.to_i
+n.times do
+    str = gets.chomp
+    words = str.split
+    is_exampt = (/chocolate|pill|book/ =~ str) != nil
+    is_imported = words.include? "imported"
+    product = Product.new(str[str.index(" ")...str.index(" at")] , words[-1].to_f, words[0].to_i, is_imported,is_exampt)
+    $products.push(product) 
 end
 
-class Main < Tax
-    def initialize
-       main
-    end
+puts
 
-    def main
-        results = []
-        puts "first line input N and next N line input queries"
-        puts "-"*40
-        n = gets.chop.to_i
-        n.times do 
-            hash = process_input()
-            results.push "#{hash[:quantity]} #{hash[:name]} : #{calculate(hash).round(2)}"
-        end
-        puts "-"*40
-        for result in results
-            puts result
-        end
-        puts "total tax : #{@@total_tax.round(2)}"
-        puts "total price : #{@@total_price.round(2)}"
-
+def calculate(products)
+    totall_price = 0
+    totall_tax = 0
+    for product in products
+        tax = 0.0
+        tax = 0.1 if !product.is_exampt
+        tax += 0.5 if product.is_imported
+        tax *= product.price * product.quantity
+        product_t_price = tax + (product.price * product.quantity)
+        totall_price += product_t_price
+        totall_tax += tax
+        puts "#{product.quantity} #{product.name} : #{product_t_price.round(2)}"
     end
-    
-    def process_input
-        hash = {}
-        array = gets.chomp.split
-        array.delete("at")
-        hash[:quantity] = array[0].to_i 
-        hash[:is_imported] = false
-        hash[:is_imported] = true if array.include? "imported" 
-        hash[:price] = array[-1].to_f
-        array.delete("imported")
-        hash[:name] = array[1...-1].join(" ")
-        return hash
-    end
+    puts "Sales Tax : #{totall_tax.round(2)}"
+    puts "Total : #{totall_price.round(2)}"
 end
 
-main = Main.new
+calculate($products)
+
+
+
+
+
+
