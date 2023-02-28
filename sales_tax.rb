@@ -28,7 +28,7 @@ def calculate(products)
     for product in products
         tax = 0.0
         tax = 0.1 if !product.is_exampt
-        tax += 0.5 if product.is_imported
+        tax += 0.05 if product.is_imported
         tax *= product.price * product.quantity
         product_t_price = tax + (product.price * product.quantity)
         totall_price += product_t_price
